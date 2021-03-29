@@ -6,7 +6,8 @@
     "idf.espIdfPath": "/Users/luis/esp/esp-idf",
     "idf.espAdfPath": "",
     "idf.espMdfPath": "",
-    "idf.port": "/dev/cu.Bluetooth-Incoming-Port",
+    "idf.port": "/dev/cu.usbserial-0001",
     "idf.pythonBinPath": "/Users/luis/.espressif/python_env/idf4.2_py3.9_env/bin/python",
-    "idf.toolsPath": ""
+    "idf.toolsPath": "",
+    "idf.flashType": "UART"
 }
