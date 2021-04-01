@@ -5,7 +5,7 @@
 // See [CONTRIBUTORS.md] for the list of HomeKit ADK project authors.
 
 // This file contains the accessory attribute database that defines the accessory information service, HAP Protocol
-// Information Service, the Pairing service and finally the service signature exposed by the light bulb.
+// Information Service, the Pairing service and finally the service signature exposed by the lock.
 
 #include "App.h"
 #include "DB.h"
@@ -24,11 +24,16 @@
 #define kIID_AccessoryInformationFirmwareRevision ((uint64_t) 0x0007)
 #define kIID_AccessoryInformationHardwareRevision ((uint64_t) 0x0008)
 #define kIID_AccessoryInformationADKVersion       ((uint64_t) 0x0009)
-#define kIID_AccessoryInformationProductData      ((uint64_t) 0x000A)
 
 #define kIID_HAPProtocolInformation                 ((uint64_t) 0x0010)
 #define kIID_HAPProtocolInformationServiceSignature ((uint64_t) 0x0011)
 #define kIID_HAPProtocolInformationVersion          ((uint64_t) 0x0012)
+
+#define kIID_Pairing                ((uint64_t) 0x0020)
+#define kIID_PairingPairSetup       ((uint64_t) 0x0022)
+#define kIID_PairingPairVerify      ((uint64_t) 0x0023)
+#define kIID_PairingPairingFeatures ((uint64_t) 0x0024)
+#define kIID_PairingPairingPairings ((uint64_t) 0x0025)
 
 #define kIID_LockMechanism                 ((uint64_t) 0x0030)
 #define kIID_LockMechanismServiceSignature ((uint64_t) 0x0031)
@@ -40,7 +45,6 @@
 #define kIID_LockManagementServiceSignature ((uint64_t) 0x0041)
 #define kIID_LockManagementLockControlPoint ((uint64_t) 0x0042)
 #define kIID_LockManagementVersion          ((uint64_t) 0x0043)
-
 
 HAP_STATIC_ASSERT(kAttributeCount == 9 + 3 + 5 + 5 + 4, AttributeCount_mismatch);
 
@@ -66,7 +70,6 @@ const HAPBoolCharacteristic accessoryInformationIdentifyCharacteristic = {
     .callbacks = { .handleRead = NULL, .handleWrite = HAPHandleAccessoryInformationIdentifyWrite }
 };
 
-
 const HAPStringCharacteristic accessoryInformationManufacturerCharacteristic = {
     .format = kHAPCharacteristicFormat_String,
     .iid = kIID_AccessoryInformationManufacturer,
@@ -88,7 +91,6 @@ const HAPStringCharacteristic accessoryInformationManufacturerCharacteristic = {
     .callbacks = { .handleRead = HAPHandleAccessoryInformationManufacturerRead, .handleWrite = NULL }
 };
 
-
 const HAPStringCharacteristic accessoryInformationModelCharacteristic = {
     .format = kHAPCharacteristicFormat_String,
     .iid = kIID_AccessoryInformationModel,
@@ -109,7 +111,6 @@ const HAPStringCharacteristic accessoryInformationModelCharacteristic = {
     .constraints = { .maxLength = 64 },
     .callbacks = { .handleRead = HAPHandleAccessoryInformationModelRead, .handleWrite = NULL }
 };
-
 
 const HAPStringCharacteristic accessoryInformationNameCharacteristic = {
     .format = kHAPCharacteristicFormat_String,
@@ -278,7 +279,6 @@ static const HAPStringCharacteristic hapProtocolInformationVersionCharacteristic
     .callbacks = { .handleRead = HAPHandleHAPProtocolInformationVersionRead, .handleWrite = NULL }
 };
 
-
 const HAPService hapProtocolInformationService = {
     .iid = kIID_HAPProtocolInformation,
     .serviceType = &kHAPServiceType_HAPProtocolInformation,
@@ -290,7 +290,6 @@ const HAPService hapProtocolInformationService = {
                                                             &hapProtocolInformationVersionCharacteristic,
                                                             NULL }
 };
-
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -396,6 +395,7 @@ const HAPService pairingService = {
 };
 
 //----------------------------------------------------------------------------------------------------------------------
+
 /**
  * The 'Service Signature' characteristic of the Lock Mechanism service.
  */

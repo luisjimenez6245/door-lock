@@ -1,11 +1,13 @@
+
 // Copyright (c) 2015-2019 The HomeKit ADK Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the “License”);
 // you may not use this file except in compliance with the License.
 // See [CONTRIBUTORS.md] for the list of HomeKit ADK project authors.
 
-// An example that implements the light bulb HomeKit profile. It can serve as a basic implementation for
+// An example that implements the lock HomeKit profile. It can serve as a basic implementation for
 // any platform. The accessory logic implementation is reduced to internal state updates and log output.
+// The example covers the Lock Mechanism service and the linked Lock Management service.
 //
 // This implementation is platform-independent.
 //
@@ -29,6 +31,7 @@
 
 #include "App.h"
 #include "DB.h"
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -97,7 +100,7 @@ static void LoadAccessoryState(void) {
 }
 
 /**
- * Save the accessory state to persistent memory.
+ * Save the accessory state to persistent memory
  */
 static void SaveAccessoryState(void) {
     HAPPrecondition(accessoryConfiguration.keyValueStore);
@@ -174,6 +177,7 @@ HAPError HandleLockMechanismLockCurrentStateRead(
     }
     return kHAPError_None;
 }
+
 /**
  * Handle read request to the 'Lock Target State' characteristic of the Lock Mechanism service.
  */
@@ -296,9 +300,7 @@ void AppAccessoryServerStart(void) {
     HAPAccessoryServerStart(accessoryConfiguration.server, &accessory);
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
-
 
 void AccessoryServerHandleUpdatedState(HAPAccessoryServerRef* server, void* _Nullable context) {
     HAPPrecondition(server);
@@ -326,9 +328,9 @@ const HAPAccessory* AppGetAccessoryInfo() {
 }
 
 void AppInitialize(
-        HAPAccessoryServerOptions* hapAccessoryServerOptions,
-        HAPPlatform* hapPlatform,
-        HAPAccessoryServerCallbacks* hapAccessoryServerCallbacks) {
+        HAPAccessoryServerOptions* hapAccessoryServerOptions HAP_UNUSED,
+        HAPPlatform* hapPlatform HAP_UNUSED,
+        HAPAccessoryServerCallbacks* hapAccessoryServerCallbacks HAP_UNUSED) {
     /*no-op*/
 }
 

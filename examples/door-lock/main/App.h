@@ -1,3 +1,4 @@
+
 // Copyright (c) 2015-2019 The HomeKit ADK Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the “License”);
@@ -33,23 +34,54 @@ HAPError IdentifyAccessory(
         void* _Nullable context);
 
 /**
- * Handle read request to the 'On' characteristic of the Light Bulb service.
+ * Handle read request to the 'CurrentState' characteristic of the Lock Mechanism service.
  */
 HAP_RESULT_USE_CHECK
-HAPError HandleLightBulbOnRead(
+HAPError HandleLockMechanismLockCurrentStateRead(
         HAPAccessoryServerRef* server,
-        const HAPBoolCharacteristicReadRequest* request,
-        bool* value,
+        const HAPUInt8CharacteristicReadRequest* request,
+        uint8_t* value,
         void* _Nullable context);
 
 /**
- * Handle write request to the 'On' characteristic of the Light Bulb service.
+ * Handle read request to the 'TargetState' characteristic of the Lock Mechanism service.
  */
 HAP_RESULT_USE_CHECK
-HAPError HandleLightBulbOnWrite(
+HAPError HandleLockMechanismLockTargetStateRead(
         HAPAccessoryServerRef* server,
-        const HAPBoolCharacteristicWriteRequest* request,
-        bool value,
+        const HAPUInt8CharacteristicReadRequest* request,
+        uint8_t* value,
+        void* _Nullable context);
+
+/**
+ * Handle write request to the 'TargetState' characteristic of the Lock Mechanism service.
+ */
+HAP_RESULT_USE_CHECK
+HAPError HandleLockMechanismLockTargetStateWrite(
+        HAPAccessoryServerRef* server,
+        const HAPUInt8CharacteristicWriteRequest* request,
+        uint8_t value,
+        void* _Nullable context);
+
+/**
+ * Handle write request to the 'ControlPoint' characteristic of the Lock Management service.
+ */
+HAP_RESULT_USE_CHECK
+HAPError HandleLockManagementLockControlPointWrite(
+        HAPAccessoryServerRef* server,
+        const HAPTLV8CharacteristicWriteRequest* request,
+        HAPTLVReaderRef* requestReader,
+        void* _Nullable context);
+
+/**
+ * Handle read request to the 'Version' characteristic of the Lock Management service.
+ */
+HAP_RESULT_USE_CHECK
+HAPError HandleLockManagementVersionRead(
+        HAPAccessoryServerRef* server,
+        const HAPStringCharacteristicReadRequest* request,
+        char* value,
+        size_t maxBytes,
         void* _Nullable context);
 
 /**
