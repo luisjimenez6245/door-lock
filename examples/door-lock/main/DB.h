@@ -53,14 +53,35 @@ extern const HAPService hapProtocolInformationService;
 extern const HAPService pairingService;
 
 /**
- * Light Bulb service.
+ * Lock Mechanism service.
  */
-extern const HAPService lightBulbService;
+extern const HAPService lockMechanismService;
 
 /**
- * The 'On' characteristic of the Light Bulb service.
+ * The 'Current State' characteristic of the Lock Mechanism service.
  */
-extern const HAPBoolCharacteristic lightBulbOnCharacteristic;
+extern const HAPUInt8Characteristic lockMechanismLockCurrentStateCharacteristic;
+
+/**
+ * The 'Target State' characteristic of the Lock Mechanism service.
+ */
+extern const HAPUInt8Characteristic lockMechanismLockTargetStateCharacteristic;
+
+/**
+ * Lock Management service.
+ */
+extern const HAPService lockManagementService;
+
+/**
+ * The 'Control Point' characteristic of the Lock Management service.
+ */
+extern const HAPTLV8Characteristic lockManagementLockControlPointCharacteristic;
+
+/**
+ * The 'Version' characteristic of the Lock Management service.
+ */
+extern const HAPStringCharacteristic lockManagementVersionCharacteristic;
+
 
 #if __has_feature(nullability)
 #pragma clang assume_nonnull end

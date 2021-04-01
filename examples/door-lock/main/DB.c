@@ -30,18 +30,19 @@
 #define kIID_HAPProtocolInformationServiceSignature ((uint64_t) 0x0011)
 #define kIID_HAPProtocolInformationVersion          ((uint64_t) 0x0012)
 
-#define kIID_Pairing                ((uint64_t) 0x0020)
-#define kIID_PairingPairSetup       ((uint64_t) 0x0022)
-#define kIID_PairingPairVerify      ((uint64_t) 0x0023)
-#define kIID_PairingPairingFeatures ((uint64_t) 0x0024)
-#define kIID_PairingPairingPairings ((uint64_t) 0x0025)
+#define kIID_LockMechanism                 ((uint64_t) 0x0030)
+#define kIID_LockMechanismServiceSignature ((uint64_t) 0x0031)
+#define kIID_LockMechanismName             ((uint64_t) 0x0032)
+#define kIID_LockMechanismLockCurrentState ((uint64_t) 0x0033)
+#define kIID_LockMechanismLockTargetState  ((uint64_t) 0x0034)
 
-#define kIID_LightBulb                 ((uint64_t) 0x0030)
-#define kIID_LightBulbServiceSignature ((uint64_t) 0x0031)
-#define kIID_LightBulbName             ((uint64_t) 0x0032)
-#define kIID_LightBulbOn               ((uint64_t) 0x0033)
+#define kIID_LockManagement                 ((uint64_t) 0x0040)
+#define kIID_LockManagementServiceSignature ((uint64_t) 0x0041)
+#define kIID_LockManagementLockControlPoint ((uint64_t) 0x0042)
+#define kIID_LockManagementVersion          ((uint64_t) 0x0043)
 
-HAP_STATIC_ASSERT(kAttributeCount == 9 + 3 + 5 + 4, AttributeCount_mismatch);
+
+HAP_STATIC_ASSERT(kAttributeCount == 9 + 3 + 5 + 5 + 4, AttributeCount_mismatch);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -65,6 +66,7 @@ const HAPBoolCharacteristic accessoryInformationIdentifyCharacteristic = {
     .callbacks = { .handleRead = NULL, .handleWrite = HAPHandleAccessoryInformationIdentifyWrite }
 };
 
+
 const HAPStringCharacteristic accessoryInformationManufacturerCharacteristic = {
     .format = kHAPCharacteristicFormat_String,
     .iid = kIID_AccessoryInformationManufacturer,
@@ -86,6 +88,7 @@ const HAPStringCharacteristic accessoryInformationManufacturerCharacteristic = {
     .callbacks = { .handleRead = HAPHandleAccessoryInformationManufacturerRead, .handleWrite = NULL }
 };
 
+
 const HAPStringCharacteristic accessoryInformationModelCharacteristic = {
     .format = kHAPCharacteristicFormat_String,
     .iid = kIID_AccessoryInformationModel,
@@ -106,6 +109,7 @@ const HAPStringCharacteristic accessoryInformationModelCharacteristic = {
     .constraints = { .maxLength = 64 },
     .callbacks = { .handleRead = HAPHandleAccessoryInformationModelRead, .handleWrite = NULL }
 };
+
 
 const HAPStringCharacteristic accessoryInformationNameCharacteristic = {
     .format = kHAPCharacteristicFormat_String,
@@ -274,6 +278,7 @@ static const HAPStringCharacteristic hapProtocolInformationVersionCharacteristic
     .callbacks = { .handleRead = HAPHandleHAPProtocolInformationVersionRead, .handleWrite = NULL }
 };
 
+
 const HAPService hapProtocolInformationService = {
     .iid = kIID_HAPProtocolInformation,
     .serviceType = &kHAPServiceType_HAPProtocolInformation,
@@ -285,6 +290,7 @@ const HAPService hapProtocolInformationService = {
                                                             &hapProtocolInformationVersionCharacteristic,
                                                             NULL }
 };
+
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -390,13 +396,12 @@ const HAPService pairingService = {
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-
 /**
- * The 'Service Signature' characteristic of the Light Bulb service.
+ * The 'Service Signature' characteristic of the Lock Mechanism service.
  */
-static const HAPDataCharacteristic lightBulbServiceSignatureCharacteristic = {
+static const HAPDataCharacteristic lockMechanismServiceSignatureCharacteristic = {
     .format = kHAPCharacteristicFormat_Data,
-    .iid = kIID_LightBulbServiceSignature,
+    .iid = kIID_LockMechanismServiceSignature,
     .characteristicType = &kHAPCharacteristicType_ServiceSignature,
     .debugDescription = kHAPCharacteristicDebugDescription_ServiceSignature,
     .manufacturerDescription = NULL,
@@ -416,11 +421,11 @@ static const HAPDataCharacteristic lightBulbServiceSignatureCharacteristic = {
 };
 
 /**
- * The 'Name' characteristic of the Light Bulb service.
+ * The 'Name' characteristic of the Lock Mechanism service.
  */
-static const HAPStringCharacteristic lightBulbNameCharacteristic = {
+static const HAPStringCharacteristic lockMechanismNameCharacteristic = {
     .format = kHAPCharacteristicFormat_String,
-    .iid = kIID_LightBulbName,
+    .iid = kIID_LockMechanismName,
     .characteristicType = &kHAPCharacteristicType_Name,
     .debugDescription = kHAPCharacteristicDebugDescription_Name,
     .manufacturerDescription = NULL,
@@ -440,16 +445,16 @@ static const HAPStringCharacteristic lightBulbNameCharacteristic = {
 };
 
 /**
- * The 'On' characteristic of the Light Bulb service.
+ * The 'CurrentState' characteristic of the Lock Mechanism service.
  */
-const HAPBoolCharacteristic lightBulbOnCharacteristic = {
-    .format = kHAPCharacteristicFormat_Bool,
-    .iid = kIID_LightBulbOn,
-    .characteristicType = &kHAPCharacteristicType_On,
-    .debugDescription = kHAPCharacteristicDebugDescription_On,
+const HAPUInt8Characteristic lockMechanismLockCurrentStateCharacteristic = {
+    .format = kHAPCharacteristicFormat_UInt8,
+    .iid = kIID_LockMechanismLockCurrentState,
+    .characteristicType = &kHAPCharacteristicType_LockCurrentState,
+    .debugDescription = kHAPCharacteristicDebugDescription_LockCurrentState,
     .manufacturerDescription = NULL,
     .properties = { .readable = true,
-                    .writable = true,
+                    .writable = false,
                     .supportsEventNotification = true,
                     .hidden = false,
                     .requiresTimedWrite = false,
@@ -459,21 +464,147 @@ const HAPBoolCharacteristic lightBulbOnCharacteristic = {
                              .supportsDisconnectedNotification = true,
                              .readableWithoutSecurity = false,
                              .writableWithoutSecurity = false } },
-    .callbacks = { .handleRead = HandleLightBulbOnRead, .handleWrite = HandleLightBulbOnWrite }
+    .units = kHAPCharacteristicUnits_None,
+    .constraints = { .minimumValue = 0,
+                     .maximumValue = 3,
+                     .stepValue = 1,
+                     .validValues = NULL,
+                     .validValuesRanges = NULL },
+    .callbacks = { .handleRead = HandleLockMechanismLockCurrentStateRead, .handleWrite = NULL }
 };
 
 /**
- * The Light Bulb service that contains the 'On' characteristic.
+ * The 'TargetState' characteristic of the Lock Mechanism service.
  */
-const HAPService lightBulbService = {
-    .iid = kIID_LightBulb,
-    .serviceType = &kHAPServiceType_LightBulb,
-    .debugDescription = kHAPServiceDebugDescription_LightBulb,
-    .name = "Light Bulb",
+const HAPUInt8Characteristic lockMechanismLockTargetStateCharacteristic = {
+    .format = kHAPCharacteristicFormat_UInt8,
+    .iid = kIID_LockMechanismLockTargetState,
+    .characteristicType = &kHAPCharacteristicType_LockTargetState,
+    .debugDescription = kHAPCharacteristicDebugDescription_LockTargetState,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = true,
+                    .writable = true,
+                    .supportsEventNotification = true,
+                    .hidden = false,
+                    .requiresTimedWrite = true,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = false, .supportsWriteResponse = false },
+                    .ble = { .supportsBroadcastNotification = true,
+                             .supportsDisconnectedNotification = true,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .units = kHAPCharacteristicUnits_None,
+    .constraints = { .minimumValue = 0,
+                     .maximumValue = 1,
+                     .stepValue = 1,
+                     .validValues = NULL,
+                     .validValuesRanges = NULL },
+    .callbacks = { .handleRead = HandleLockMechanismLockTargetStateRead,
+                   .handleWrite = HandleLockMechanismLockTargetStateWrite }
+};
+
+/**
+ * The Lock Mechanism service that contains the above characteristics.
+ */
+const HAPService lockMechanismService = {
+    .iid = kIID_LockMechanism,
+    .serviceType = &kHAPServiceType_LockMechanism,
+    .debugDescription = kHAPServiceDebugDescription_LockMechanism,
+    .name = "Lock",
     .properties = { .primaryService = true, .hidden = false, .ble = { .supportsConfiguration = false } },
-    .linkedServices = NULL,
-    .characteristics = (const HAPCharacteristic* const[]) { &lightBulbServiceSignatureCharacteristic,
-                                                            &lightBulbNameCharacteristic,
-                                                            &lightBulbOnCharacteristic,
+    .linkedServices = (uint16_t const[]) { kIID_LockManagement, 0 },
+    .characteristics = (const HAPCharacteristic* const[]) { &lockMechanismServiceSignatureCharacteristic,
+                                                            &lockMechanismNameCharacteristic,
+                                                            &lockMechanismLockCurrentStateCharacteristic,
+                                                            &lockMechanismLockTargetStateCharacteristic,
+                                                            NULL }
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+
+/**
+ * The 'Service Signature' characteristic of the Lock Management service.
+ */
+static const HAPDataCharacteristic lockManagementServiceSignatureCharacteristic = {
+    .format = kHAPCharacteristicFormat_Data,
+    .iid = kIID_LockManagementServiceSignature,
+    .characteristicType = &kHAPCharacteristicType_ServiceSignature,
+    .debugDescription = kHAPCharacteristicDebugDescription_ServiceSignature,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = true,
+                    .writable = false,
+                    .supportsEventNotification = false,
+                    .hidden = false,
+                    .requiresTimedWrite = false,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = true },
+                    .ble = { .supportsBroadcastNotification = false,
+                             .supportsDisconnectedNotification = false,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .constraints = { .maxLength = 2097152 },
+    .callbacks = { .handleRead = HAPHandleServiceSignatureRead, .handleWrite = NULL }
+};
+
+/**
+ * The 'ControlPoint' characteristic of the Lock Management service.
+ */
+const HAPTLV8Characteristic lockManagementLockControlPointCharacteristic = {
+    .format = kHAPCharacteristicFormat_TLV8,
+    .iid = kIID_LockManagementLockControlPoint,
+    .characteristicType = &kHAPCharacteristicType_LockControlPoint,
+    .debugDescription = kHAPCharacteristicDebugDescription_LockControlPoint,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = false,
+                    .writable = true,
+                    .supportsEventNotification = false,
+                    .hidden = false,
+                    .requiresTimedWrite = true,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = false, .supportsWriteResponse = false },
+                    .ble = { .supportsBroadcastNotification = false,
+                             .supportsDisconnectedNotification = false,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .callbacks = { .handleRead = NULL, .handleWrite = HandleLockManagementLockControlPointWrite }
+};
+
+/**
+ * The 'Version' characteristic of the Lock Management service.
+ */
+const HAPStringCharacteristic lockManagementVersionCharacteristic = {
+    .format = kHAPCharacteristicFormat_String,
+    .iid = kIID_LockManagementVersion,
+    .characteristicType = &kHAPCharacteristicType_Version,
+    .debugDescription = kHAPCharacteristicDebugDescription_Version,
+    .manufacturerDescription = NULL,
+    .properties = { .readable = true,
+                    .writable = false,
+                    .supportsEventNotification = false,
+                    .hidden = false,
+                    .requiresTimedWrite = false,
+                    .supportsAuthorizationData = false,
+                    .ip = { .controlPoint = false, .supportsWriteResponse = false },
+                    .ble = { .supportsBroadcastNotification = false,
+                             .supportsDisconnectedNotification = false,
+                             .readableWithoutSecurity = false,
+                             .writableWithoutSecurity = false } },
+    .constraints = { .maxLength = 64 },
+    .callbacks = { .handleRead = HandleLockManagementVersionRead, .handleWrite = NULL }
+};
+
+/**
+ * The Lock Management service that contains the above characteristics.
+ */
+const HAPService lockManagementService = {
+    .iid = kIID_LockManagement,
+    .serviceType = &kHAPServiceType_LockManagement,
+    .debugDescription = kHAPServiceDebugDescription_LockManagement,
+    .name = NULL,
+    .properties = { .primaryService = false, .hidden = false, .ble = { .supportsConfiguration = false } },
+    .linkedServices = (uint16_t const[]) { kIID_LockMechanism, 0 },
+    .characteristics = (const HAPCharacteristic* const[]) { &lockManagementServiceSignatureCharacteristic,
+                                                            &lockManagementLockControlPointCharacteristic,
+                                                            &lockManagementVersionCharacteristic,
                                                             NULL }
 };

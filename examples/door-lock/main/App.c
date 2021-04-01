@@ -52,7 +52,8 @@
  */
 typedef struct {
     struct {
-        bool lightBulbOn;
+        HAPCharacteristicValue_LockCurrentState currentState;
+        HAPCharacteristicValue_LockTargetState targetState;
     } state;
     HAPAccessoryServerRef* server;
     HAPPlatformKeyValueStoreRef keyValueStore;
@@ -117,24 +118,23 @@ static void SaveAccessoryState(void) {
 //----------------------------------------------------------------------------------------------------------------------
 
 /**
- * HomeKit accessory that provides the Light Bulb service.
- *
- * Note: Not constant to enable BCT Manual Name Change.
+ * HomeKit accessory that provides the Lock service.
  */
-static HAPAccessory accessory = { .aid = 1,
-                                  .category = kHAPAccessoryCategory_Lighting,
-                                  .name = "Acme Light Bulb",
-                                  .manufacturer = "Acme",
-                                  .model = "LightBulb1,1",
-                                  .serialNumber = "099DB48E9E28",
-                                  .firmwareVersion = "1",
-                                  .hardwareVersion = "1",
-                                  .services = (const HAPService* const[]) { &accessoryInformationService,
-                                                                            &hapProtocolInformationService,
-                                                                            &pairingService,
-                                                                            &lightBulbService,
-                                                                            NULL },
-                                  .callbacks = { .identify = IdentifyAccessory } };
+static const HAPAccessory accessory = { .aid = 1,
+                                        .category = kHAPAccessoryCategory_Locks,
+                                        .name = "Acme Lock",
+                                        .manufacturer = "Acme",
+                                        .model = "Lock1,1",
+                                        .serialNumber = "099DB48E9E28",
+                                        .firmwareVersion = "1",
+                                        .hardwareVersion = "1",
+                                        .services = (const HAPService* const[]) { &accessoryInformationService,
+                                                                                  &hapProtocolInformationService,
+                                                                                  &pairingService,
+                                                                                  &lockMechanismService,
+                                                                                  &lockManagementService,
+                                                                                  NULL },
+                                        .callbacks = { .identify = IdentifyAccessory } };
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -147,47 +147,135 @@ HAPError IdentifyAccessory(
     return kHAPError_None;
 }
 
+/**
+ * Handle read request to the 'Lock Current State' characteristic of the Lock Mechanism service.
+ */
 HAP_RESULT_USE_CHECK
-HAPError HandleLightBulbOnRead(
+HAPError HandleLockMechanismLockCurrentStateRead(
         HAPAccessoryServerRef* server HAP_UNUSED,
-        const HAPBoolCharacteristicReadRequest* request HAP_UNUSED,
-        bool* value,
+        const HAPUInt8CharacteristicReadRequest* request HAP_UNUSED,
+        uint8_t* value,
         void* _Nullable context HAP_UNUSED) {
-    *value = accessoryConfiguration.state.lightBulbOn;
-    HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, *value ? "true" : "false");
-
+    HAPLogInfo(&kHAPLog_Default, "%s", __func__);
+    *value = accessoryConfiguration.state.currentState;
+    switch (*value) {
+        case kHAPCharacteristicValue_LockCurrentState_Secured: {
+            HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, "LockCurrentState_Secured");
+        } break;
+        case kHAPCharacteristicValue_LockCurrentState_Unsecured: {
+            HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, "LockCurrentState_Unsecured");
+        } break;
+        case kHAPCharacteristicValue_LockCurrentState_Jammed: {
+            HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, "LockCurrentState_Jammed");
+        } break;
+        case kHAPCharacteristicValue_LockCurrentState_Unknown: {
+            HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, "LockCurrentState_Unknown");
+        } break;
+    }
+    return kHAPError_None;
+}
+/**
+ * Handle read request to the 'Lock Target State' characteristic of the Lock Mechanism service.
+ */
+HAP_RESULT_USE_CHECK
+HAPError HandleLockMechanismLockTargetStateRead(
+        HAPAccessoryServerRef* server HAP_UNUSED,
+        const HAPUInt8CharacteristicReadRequest* request HAP_UNUSED,
+        uint8_t* value,
+        void* _Nullable context HAP_UNUSED) {
+    HAPLogInfo(&kHAPLog_Default, "%s", __func__);
+    *value = accessoryConfiguration.state.targetState;
+    switch (*value) {
+        case kHAPCharacteristicValue_LockTargetState_Secured: {
+            HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, "LockTargetState_Secured");
+        } break;
+        case kHAPCharacteristicValue_LockTargetState_Unsecured: {
+            HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, "LockTargetState_Unsecured");
+        } break;
+    }
     return kHAPError_None;
 }
 
+/**
+ * Handle write request to the 'Lock Target State' characteristic of the Lock Mechanism service.
+ */
 HAP_RESULT_USE_CHECK
-HAPError HandleLightBulbOnWrite(
+HAPError HandleLockMechanismLockTargetStateWrite(
         HAPAccessoryServerRef* server,
-        const HAPBoolCharacteristicWriteRequest* request,
-        bool value,
+        const HAPUInt8CharacteristicWriteRequest* request,
+        uint8_t value,
         void* _Nullable context HAP_UNUSED) {
-    HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, value ? "true" : "false");
-    if (accessoryConfiguration.state.lightBulbOn != value) {
-        accessoryConfiguration.state.lightBulbOn = value;
-
-        SaveAccessoryState();
-
-        HAPAccessoryServerRaiseEvent(server, request->characteristic, request->service, request->accessory);
+    HAPLogInfo(&kHAPLog_Default, "%s", __func__);
+    HAPCharacteristicValue_LockTargetState targetState = (HAPCharacteristicValue_LockTargetState) value;
+    switch (targetState) {
+        case kHAPCharacteristicValue_LockTargetState_Secured: {
+            HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, "LockTargetState_Secured");
+        } break;
+        case kHAPCharacteristicValue_LockTargetState_Unsecured: {
+            HAPLogInfo(&kHAPLog_Default, "%s: %s", __func__, "LockTargetState_Unsecured");
+        } break;
     }
 
+    if (accessoryConfiguration.state.targetState != targetState) {
+        accessoryConfiguration.state.targetState = targetState;
+        HAPAccessoryServerRaiseEvent(server, request->characteristic, request->service, request->accessory);
+        SaveAccessoryState();
+    }
+    return kHAPError_None;
+}
+
+/**
+ * Handle write request to the 'Lock Control Point' characteristic of the Lock Management service.
+ */
+HAP_RESULT_USE_CHECK
+HAPError HandleLockManagementLockControlPointWrite(
+        HAPAccessoryServerRef* server HAP_UNUSED,
+        const HAPTLV8CharacteristicWriteRequest* request HAP_UNUSED,
+        HAPTLVReaderRef* requestReader,
+        void* _Nullable context HAP_UNUSED) {
+    HAPPrecondition(requestReader);
+
+    HAPLogInfo(&kHAPLog_Default, "%s", __func__);
+
+    HAPError err;
+
+    // Simply validate input.
+    err = HAPTLVReaderGetAll(requestReader, (HAPTLV* const[]) { NULL });
+    if (err) {
+        HAPAssert(err == kHAPError_InvalidData);
+        return err;
+    }
+    return kHAPError_None;
+}
+
+/**
+ * Handle read request to the 'Version' characteristic of the Lock Management service.
+ */
+HAP_RESULT_USE_CHECK
+HAPError HandleLockManagementVersionRead(
+        HAPAccessoryServerRef* server HAP_UNUSED,
+        const HAPStringCharacteristicReadRequest* request HAP_UNUSED,
+        char* value,
+        size_t maxBytes,
+        void* _Nullable context HAP_UNUSED) {
+    HAPLogInfo(&kHAPLog_Default, "%s", __func__);
+    const char* stringToCopy = "1.0";
+    size_t numBytes = HAPStringGetNumBytes(stringToCopy);
+    if (numBytes >= maxBytes) {
+        HAPLogError(
+                &kHAPLog_Default,
+                "Not enough space to store %s (needed: %zu, available: %zu).",
+                "Version",
+                numBytes + 1,
+                maxBytes);
+        return kHAPError_OutOfResources;
+    }
+    HAPRawBufferCopyBytes(value, stringToCopy, numBytes);
+    value[numBytes] = '\0';
     return kHAPError_None;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-
-void AccessoryNotification(
-        const HAPAccessory* accessory,
-        const HAPService* service,
-        const HAPCharacteristic* characteristic,
-        void* ctx) {
-    HAPLogInfo(&kHAPLog_Default, "Accessory Notification");
-
-    HAPAccessoryServerRaiseEvent(accessoryConfiguration.server, characteristic, service, accessory);
-}
 
 void AppCreate(HAPAccessoryServerRef* server, HAPPlatformKeyValueStoreRef keyValueStore) {
     HAPPrecondition(server);
@@ -208,7 +296,9 @@ void AppAccessoryServerStart(void) {
     HAPAccessoryServerStart(accessoryConfiguration.server, &accessory);
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
+
 
 void AccessoryServerHandleUpdatedState(HAPAccessoryServerRef* server, void* _Nullable context) {
     HAPPrecondition(server);
